@@ -1,0 +1,105 @@
+.body {
+  width: 100%;
+}
+.inputBox {
+  padding: 10px;
+}
+
+.floor {
+  display: flex;
+  background-color: gray;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0px 20px;
+  height: 10rem;
+  border-bottom: solid 3px rgb(58, 57, 57);
+  overflow: "visible";
+}
+
+#commands {
+  display: flex;
+  flex-direction: column;
+}
+button {
+  margin: 5px;
+  background-color: rgb(250, 89, 89);
+}
+
+.liftGate {
+  display: inline-flex;
+  position: inline-block;
+  background-color: rgb(223, 210, 210);
+  transform: translateY(0%);
+  transition: 3s;
+}
+
+
+
+@keyframes moveLeft {
+  0% {
+    width: 37px;
+  }
+  50% {
+    width: 0px;
+  }
+  100% {
+    width: 37px;
+  }
+}
+
+@keyframes moveRight {
+  0% {
+    width: 37px;
+  }
+  50% {
+    width: 0px;
+  }
+  100% {
+    width: 37px;
+  }
+}
+
+.animateLeft {
+  background-color: white;
+  width: 37px;
+}
+.animateRight {
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: end;
+
+  background-color: white;
+  width: 37px;
+}
+
+.liftGateLeft {
+  border: 1px solid black;
+  width: 37px;
+  height: 150px;
+  background-color: gray;
+  position: sticky;
+
+  animation: moveLeft;
+  animation-duration: 5s;
+}
+.liftGateRight {
+  border: 1px solid black;
+  width: 37px;
+  height: 150px;
+  background-color: gray;
+  position: sticky;
+  animation: moveRight;
+  animation-duration: 5s;
+}
+
+.animLeft {
+  animation: moveLeft;
+  animation-duration: 5s;
+}
+.animRight {
+  animation: moveRight;
+  animation-duration: 5s;
+}
+.animUp {
+  transform: translateY(-100%);
+}
