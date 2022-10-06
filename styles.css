@@ -1,5 +1,13 @@
+
+:root {
+  --width: 37px;
+  --height: 150px;
+}
+
 .body {
   width: 100%;
+  overflow: "visible";
+
 }
 .inputBox {
   padding: 10px;
@@ -11,7 +19,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 0px 20px;
-  height: 10rem;
+  height:  calc(var(--height) + 10px);
   border-bottom: solid 3px rgb(58, 57, 57);
   overflow: "visible";
 }
@@ -37,31 +45,31 @@ button {
 
 @keyframes moveLeft {
   0% {
-    width: 37px;
+    width: var(--width);
   }
   50% {
     width: 0px;
   }
   100% {
-    width: 37px;
+    width: var(--width);
   }
 }
 
 @keyframes moveRight {
   0% {
-    width: 37px;
+    width: var(--width);
   }
   50% {
     width: 0px;
   }
   100% {
-    width: 37px;
+    width: var(--width);
   }
 }
 
 .animateLeft {
   background-color: white;
-  width: 37px;
+  width: var(--width);
 }
 .animateRight {
   display: flex;
@@ -69,27 +77,35 @@ button {
   align-items: end;
 
   background-color: white;
-  width: 37px;
+  width: var(--width);
 }
 
 .liftGateLeft {
   border: 1px solid black;
-  width: 37px;
-  height: 150px;
+  width: var(--width);
+  height: var(--height);
   background-color: gray;
   position: sticky;
-
   animation: moveLeft;
   animation-duration: 5s;
+
 }
 .liftGateRight {
   border: 1px solid black;
-  width: 37px;
-  height: 150px;
+  width: var(--width);
+  height: var(--height);
   background-color: gray;
   position: sticky;
   animation: moveRight;
   animation-duration: 5s;
+
+}
+
+.animationLeft{
+
+}
+
+.animationRight{
 }
 
 .animLeft {
@@ -102,4 +118,19 @@ button {
 }
 .animUp {
   transform: translateY(-100%);
+}
+
+@media (max-width: 640px) {
+  
+:root {
+  --width: 20px;
+  --height: 75px;
+}
+  .liftGateLeft, .liftGateRight {
+    width: var(--width);
+    height: var(--height);
+  }
+
+  .liftGateRight {
+  }
 }

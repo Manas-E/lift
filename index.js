@@ -3,6 +3,8 @@ let liftArea = document.getElementById("liftArea");
 let liftDoorsActive =[];
 let floorNum = 0;
 let submitBtn = document.getElementById("btnSave");
+const form = document.querySelector('form')
+
 let liftHTML = `
   <div class="floor">
     <div id="commands">
@@ -39,12 +41,24 @@ let floorsArr = [];
 let currentLift = 0;
 let totalFloors;
 let totalLifts;
-const ELEVATOR_SPEED = 500; // pixels per second
+let diffFloor=0;
+
+const ELEVATOR_SPEED = 75; // pixels per second
 
 const delay = (delayInms) => {
   return new Promise((resolve) =>{ setTimeout(resolve, delayInms) 
                                  console.log("delay")   });
 }
+
+
+const getPrevFloor = liftNumber=>{
+  for(let i=0;i<floorsArr.length;i++) {
+     if(floorsArr[i][liftNumber] === 1)
+       return i;  
+ }
+
+ }
+
 
 function controller(destFloorID) {
   let liftGates = document.getElementsByClassName("liftGate");
@@ -52,8 +66,11 @@ function controller(destFloorID) {
   if (floorsArr[destFloorID].includes(1)) {
    let liftNumber = floorsArr[destFloorID].indexOf(1)
    let diff = totalFloors - 1 - destFloorID;
-   if(!liftDoorsActive[liftNumber])
-   animateDoor(liftNumber,destFloorID);
+   let isLiftActive =  liftGates[liftNumber].getAttribute("data-active") == "true"
+
+   if(!liftDoorsActive[liftNumber] && !isLiftActive)
+   animateDoor(liftNumber,destFloorID,liftGates[liftNumber]);
+   
   }
   else{
     let dl =0,liftNumber, time;
@@ -66,13 +83,16 @@ function controller(destFloorID) {
       if (floorsArr[destFloorID + dl] && floorsArr[destFloorID + dl].includes(1)) {
         liftNumber = floorsArr[destFloorID + dl].indexOf(1)
         let diff = totalFloors - 1 - destFloorID;
-        time = Math.abs(diff) * 10000/ ELEVATOR_SPEED
-        if(!liftDoorsActive[liftNumber])
+        time = Math.ceil(Math.abs(dl*106)*1000 / ELEVATOR_SPEED) 
+        console.log("diff:",dl,"time:",time)
+        isLiftActive =  liftGates[liftNumber].getAttribute("data-active") == "true"
+
+        if(!liftDoorsActive[liftNumber] && !isLiftActive)
         {
-          
+          diffFloor=dl;
           floorsArr[destFloorID + dl][liftNumber] =0;
           floorsArr[destFloorID][liftNumber] =1
-          animateLiftMotion(liftGates[liftNumber], diff,liftNumber);
+          animateLiftMotion(liftGates[liftNumber], diff,dl);
          
           break;
         }
@@ -81,12 +101,15 @@ function controller(destFloorID) {
        if (floorsArr[destFloorID -dl] && floorsArr[destFloorID -dl].includes(1)) {
         liftNumber = floorsArr[destFloorID -dl].indexOf(1)
         let diff = totalFloors - 1 - destFloorID;
-        time =Math.abs(diff) * 10000 / ELEVATOR_SPEED
-  
-        if(!liftDoorsActive[liftNumber]){
+        time = Math.ceil(Math.abs(dl*106) * 1000 / ELEVATOR_SPEED) 
+        console.log("diff:",dl,"time:",time)
+        isLiftActive =  liftGates[liftNumber].getAttribute("data-active") == "true"
+
+        if(!liftDoorsActive[liftNumber] && !isLiftActive){
+          diffFloor=dl;
           floorsArr[destFloorID - dl][liftNumber] =0;
           floorsArr[destFloorID][liftNumber] =1
-          animateLiftMotion(liftGates[liftNumber], diff,liftNumber);
+          animateLiftMotion(liftGates[liftNumber], diff,dl);
           break;
         }
      
@@ -96,16 +119,9 @@ function controller(destFloorID) {
      
     }    
     
-    const getPrevFloor = liftNumber=>{
-     for(let i=0;i<floorsArr.length;i++) {
-        if(floorsArr[i][liftNumber] === 1)
-          return i;  
-    }
-   
-    }
+ 
 
-    
-
+console.log("time :",time)
     let arrived = new Promise((resolve, reject) => setTimeout(() => {
       resolve("Success!"); // Yay! Everything went well!
     }, time + 1000))
@@ -117,28 +133,45 @@ function controller(destFloorID) {
       {
         floorsArr[destFloorID][liftNumber] =1;
         floorsArr[prevFloor][liftNumber] =0;
-        animateLiftMotion(liftGates[liftNumber], diff,liftNumber);
-      }
-     
-        
-      animateDoor(liftNumber, parseInt(totalFloors) + 1)
-     
+        console.log("<< ", diff)
+        animateLiftMotion(liftGates[liftNumber], diff,destFloorID-prevFloor);
+        tk = Math.ceil(Math.abs((destFloorID-prevFloor)*106) * 1000 / ELEVATOR_SPEED) + 1500
 
+        setTimeout(()=>animateDoor(liftNumber, parseInt(totalFloors) + 1,liftGates[liftNumber]),tk
+        )
+      }
+      else
+      animateDoor(liftNumber, parseInt(totalFloors) + 1,liftGates[liftNumber])
         console.log('micro task')
         })
     
   }
 
 }
-let liftStack = [],liftGates;
-btn.addEventListener("click", () => {
+let timerId;
 
+function debounce(f,time){
+  if (timerId) {
+		return
+	}
+  f()
+	// Schedule a setTimeout after delay seconds
+	timerId  =  setTimeout(function () {
+    
+		
+		// Once setTimeout function execution is finished, timerId = undefined so that in <br>
+		// the next scroll event function execution can be scheduled by the setTimeout
+		timerId  =  undefined;
+	}, time)
+}
+
+let liftStack = [],liftGates;
+form.addEventListener('submit', (e) => {
+  e.preventDefault();
   floorsArr =[]
   liftDoorsActive=[]
-  totalFloors = 5
-  //  document.getElementById("floorInput").value;
-  totalLifts = 3
-  //  document.getElementById("liftInput").value;
+  totalFloors = document.getElementById("floorInput").value;
+  totalLifts =  document.getElementById("liftInput").value;
 
   console.log(totalFloors,totalLifts);
   createLifts(totalFloors, totalLifts);
@@ -152,37 +185,48 @@ btn.addEventListener("click", () => {
   upbtns = [...upbtns];
 
   console.log(upbtns);
-
-  upbtns.forEach((upbtn, idx) =>
+  setTimeout(()=>{
+    upbtns.forEach((upbtn, idx) =>
     upbtn.addEventListener("click", (e) => {
       let diff = totalFloors - 1 - idx;
       let liftNumber =0, currentFloorID = idx;
-      console.log(idx, "btn clicked", diff);
       controller(idx)
+     
     })
-  );
-});
+  )
+  },5000)
 
-function animateLiftMotion(liftElement, diff, liftNumber) {
-  diff = -(diff * 106 + diff);
-  if(Math.abs( diff ) === 0 )
-  liftElement.style.transitionDuration = `${Math.abs(107) / ELEVATOR_SPEED}s`
+});
+function animateLiftMotion(liftElement, diff, prevFloor) {
+  liftElement.setAttribute("data-active",true) 
+
+  let resK = screen.width < 640 ? 112 : 106;
+  console.log("animate lift")
+
+  let totalDistance =diffFloor * resK + diff
+  diff = -(diff * resK + diff);
+  if(Math.abs( diff ) === 0 ){
+    console.log(prevFloor)
+    liftElement.style.transitionDuration = `${Math.abs( prevFloor*resK) / ELEVATOR_SPEED}s`
+
+  }
   else
-  liftElement.style.transitionDuration = `${Math.abs(diff) / ELEVATOR_SPEED}s`
+  liftElement.style.transitionDuration = `${Math.abs(totalDistance) / ELEVATOR_SPEED}s`
 
   liftElement.style.transitionTimingFunction = "linear";
 
+  console.log(diff)
   liftElement.style.transform = `translateY(${diff}%)`;
 
-  setTimeout(()=>{ 
-  },5000);
-  for (let i = 0; i < diff; i++) {
-  }
+
 }
 
-async function animateDoor(liftNumber,destFloorID) {
+async function animateDoor(liftNumber,destFloorID,liftElement) {
   let upbtns = document.getElementsByClassName("upButton");
   liftDoorsActive[liftNumber] = true;
+  liftElement.setAttribute("data-active",false) 
+
+  console.log("animate door")
 
   let allLeftLiftGates = document.getElementsByClassName("liftGateLeft");
   let allRightLiftGates = document.getElementsByClassName("liftGateRight");
@@ -205,14 +249,15 @@ async function animateDoor(liftNumber,destFloorID) {
   //   }
   // }, 1000 / 60);
 
+  
   l1.classList.toggle("animRight");
   l2.classList.toggle("animLeft");
   setTimeout(()=>{ 
     let diff = totalFloors - 1 - destFloorID;
     liftDoorsActive[liftNumber] = false;  
- 
+    console.log("settimeout door")
   },5000);
-}   
+}      
 
 
 function createLifts(totalFloors, totalLifts) {

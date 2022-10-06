@@ -10,17 +10,18 @@
   <body>
     <div style="display: flex; flex-direction: column; align-items: center">
       <h1>Lift Simulation</h1>
-
+      <form id="form">
       <div class="inputBox">
         <label>No of Lifts:</label>
-        <input type="number" id="liftInput" value="" />
+        <input type="number" min="1" max="4" id="liftInput"  >
       </div>
 
       <div class="inputBox">
         <label for="">No of Floors </label>
-        <input type="number" id="floorInput" value="" />
+        <input type="number" min="1" max="15" id="floorInput" >
       </div>
-      <button id="btn">Go</button>
+      <button id="btn" type="submit">Go</button>
+    </form>
     </div>
 
     <div id="liftArea"></div>
