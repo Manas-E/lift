@@ -8,8 +8,8 @@ const form = document.querySelector('form')
 let liftHTML = `
   <div class="floor">
     <div id="commands">
-      <button  id="upButton">+</button>
-      <button>-</button>
+      <button  class="upButton">+</button>
+      <button class="downButton">-</button>
     </div>
 
     <div id="gates">
@@ -182,9 +182,11 @@ form.addEventListener('submit', (e) => {
   console.log(allLeftLiftGates, allRightLiftGates, liftGates);
 
   let upbtns = document.getElementsByClassName("upButton");
-  upbtns = [...upbtns];
+  let downbtns = document.getElementsByClassName("downButton");
 
-  console.log(upbtns);
+  upbtns = [...upbtns];
+  downbtns=[...downbtns];
+  console.log(downbtns);
   setTimeout(()=>{
     upbtns.forEach((upbtn, idx) =>
     upbtn.addEventListener("click", (e) => {
@@ -194,6 +196,14 @@ form.addEventListener('submit', (e) => {
      
     })
   )
+  downbtns.forEach((upbtn, idx) =>
+  upbtn.addEventListener("click", (e) => {
+    let diff = totalFloors - 1 - idx;
+    let liftNumber =0, currentFloorID = idx;
+    controller(idx)
+   
+  })
+)
   },5000)
 
 });
@@ -278,7 +288,7 @@ function createLifts(totalFloors, totalLifts) {
   <div class="floor">
     <div id="commands">
       <button class="upButton">+</button>
-      <button>-</button>
+      <button class="downButton">-</button>
     </div>
    
     ${i + 1 == totalFloors ? gateHTML : ""}
